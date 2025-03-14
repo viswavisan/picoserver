@@ -1,4 +1,4 @@
-import json,socket,os
+import json,socket,os,time,machine
 class Server:
     def __init__(self):
         self.routes = {}
@@ -52,10 +52,15 @@ class Server:
         client.send(response_body.encode('utf-8'))
         client.close()
 
-    def run(self, host='127.0.0.1', port=8000):
+    def run(self, host='0.0.0.0', port=80):
         server = socket.socket()
-        server.bind((host, port))
-        server.listen(10)
+        for i in range (10):
+            try:server.bind((host, port));break
+            except Exception as e:
+                time.sleep(1)
+                print('reconnecting'+str(i))
+                if i==9:machine.reset()
+        server.listen(1)
         print(f'Serving on http://{host}:{port}')
 
         while True:
@@ -64,8 +69,9 @@ class Server:
 
     def template_response(self, file_path, context=None):
         if context is None:context = {}
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:html_content = file.read()
-            for key, value in context.items():html_content = html_content.replace(f'{{{{ {key} }}}}', str(value))
-            return html_content
-        else:return '<h1>404 Not Found</h1>'
+        with open(file_path, 'r') as file:html_content = file.read()
+        for key, value in context.items():html_content = html_content.replace(f'{{{{ {key} }}}}', str(value))
+        #return html_content.format(**{key: context.get(key, f'{{{key}}}') for key in template.format_map({}).keys()})
+
+        return html_content
+

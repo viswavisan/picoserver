@@ -1,24 +1,27 @@
+import hotspot
 from miniserver import Server
 import os
+import machine
+import gc
+gc.mem_free()
+
+led = machine.Pin("LED", machine.Pin.OUT)
+led.off()
+led.on()
 
 app = Server()
 
 @app.get("/")
 def home(data=None):
-    context = {
-        'title': 'My FastAPI App',
-        'heading': 'Hello, World!',
-        'message': 'Welcome to my FastAPI-like application!'}
+    temp=27 - (machine.ADC(4).read_u16() * (3.3 / 65535.0)- 0.706) / 0.001721
+    memory=f'{264-(gc.mem_free()// 1024)} KB/264 KB'
+    context = {'temperature':temp,'memory':memory}
     return app.template_response('index.html', context)
 
 @app.get("/files")
 def get_files(data=None):
     directory = '.'
-    files_and_dirs = {'files': [], 'dirs': ['']}
-    for root, dirs, files in os.walk(directory):
-        if '.git' in dirs:dirs.remove('.git')
-        for name in dirs:files_and_dirs['dirs'].append(os.path.relpath(os.path.join(root, name), directory))  # Add directories
-        for name in files:files_and_dirs['files'].append(os.path.relpath(os.path.join(root, name), directory))  # Add files
+    files_and_dirs = {'files': os.listdir(), 'dirs': ['']}  
     return files_and_dirs
 
 @app.post("/upload")

@@ -1,86 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File List</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 { color: #007BFF; text-align: center; }
-        h2 { color: #333; }
-        .container {
-            margin: auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-        }
-        .device-details, .file-section { flex: 1; margin: 10px; }
-        .box, .wifi-info {
-            margin-top: 20px;
-            padding: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-        }
-        #file-list { list-style-type: none; padding: 0; }
-        #file-list li {
-            background: #fff; margin: 5px 0; padding: 10px; border-radius: 5px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        button {
-            background: none; border: none; cursor: pointer; font-size: 20px; color: #007BFF;
-            transition: color 0.3s;
-        }
-        button:hover { color: #0056b3; }
-        input, select {
-            margin: 10px 0; padding: 10px; border-radius: 5px; border: 1px solid #ccc; width: calc(100% - 25px);
-        }
-        .action-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
-    </style>
 
-</head>
-<body>
-    <h1>RaspberryPi PICO</h1>
-    <div class="container">
-        <div class="device-details">
-            <h2>Device Details</h2>
-            <div class="wifi-info">
-                <p>IP Address: <span id="ip-address">192.168.4.1</span></p>
-                <p>Temperature: <span id="temperature"> {{ temperature }} </span></p>
-                <p>Memory used: <span id="memory"> {{ memory }} </span></p>
-                <p>Access Point Name: <strong>picow</strong></p>
-                <p>Password: <strong>picow123</strong></p>
-                <p>Hotspot Status: off <button>on</button></p>
-                <p>Wi-Fi: Not connected <button id="connect_wifi">+</button></p>
-            </div>
-        </div>
-        <div class="file-section">
-            <h2>Files:</h2>
-            <div class="box">
-                <ul id="file-list"></ul>
-            </div>
-            <div>
-                <label for="directory">Select Directory:</label>
-                <select name="directory" id="directory"></select>
-                <div class="action-buttons">
-                    <input type="file" name="file" id="file" required>
-                    <button id="upload-button">&#8682;</button>
-                </div>
-                <label for="new-directory-name">Add Folder:</label>
-                <input type="text" id="new-directory-name" placeholder="Enter new directory name" required>
-                <button id="add-directory-button">&#128193;</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchFiles();
@@ -111,19 +29,6 @@
                 .catch(console.error);
         }
         
-        </script>
-        
-        <script>
-                function addDirectory() {
-            const newDirectoryName = document.getElementById('new-directory-name').value;
-            if (!newDirectoryName) return alert('Please enter a directory name.');
-            const option = document.createElement('option');
-            option.value = newDirectoryName; option.textContent = newDirectoryName;
-            document.getElementById('directory').appendChild(option);
-            document.getElementById('new-directory-name').value = '';
-        }
-        <script>
-        <script>
 
         function upload(event) {
             event.preventDefault();
@@ -153,8 +58,7 @@
             };
             reader.readAsArrayBuffer(file);
         }
-        </script>
-        <script>
+
         
 
         function downloadFile(fileName) {
@@ -191,7 +95,11 @@
             .catch(console.error);
         }
 
-
-    </script>
-</body>
-</html>
+        function addDirectory() {
+            const newDirectoryName = document.getElementById('new-directory-name').value;
+            if (!newDirectoryName) return alert('Please enter a directory name.');
+            const option = document.createElement('option');
+            option.value = newDirectoryName; option.textContent = newDirectoryName;
+            document.getElementById('directory').appendChild(option);
+            document.getElementById('new-directory-name').value = '';
+        }
