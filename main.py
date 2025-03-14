@@ -1,9 +1,11 @@
+import gc
+gc.mem_free()
 import hotspot
 from miniserver import Server
 import os
 import machine
-import gc
-gc.mem_free()
+
+return_value={}
 
 led = machine.Pin("LED", machine.Pin.OUT)
 led.off()
@@ -20,10 +22,14 @@ def home(data=None):
 
 @app.post("/execute")
 def execute(request:dict=None):
-    if 'cmd' in request:return_value={};exec(request['cmd']);return return_value
+    try:
+        if 'cmd' in request:exec(request['cmd']);return return_value
+        return 'working fine'
+    except Exception as e:return str(e)
 
 @app.get("/files")
 def get_files(data=None):
+    directory = '.'
     files_and_dirs = {'files': os.listdir(), 'dirs': ['']}  
     return files_and_dirs
 
