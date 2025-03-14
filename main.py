@@ -5,7 +5,10 @@ from miniserver import Server
 import os
 import machine
 
-connection.enable_hotspot()
+x=connection.enable_hotspot()
+print(x)
+x=connection.connect_wifi()
+print(x)
 
 return_value={}
 
@@ -26,10 +29,10 @@ def home(data=None):
 def on(data=None):
     led.on()
     return 'ok'
-@app.get("/lightoff")
-def on(data=None):
-    led.off()
-    return 'ok'
+@app.get("/connect_wifi")
+def wifi(data=dict):
+    response=connection.connect_wifi(data['ssid'],data['password'])
+    return response
     
 
 @app.post("/execute")
@@ -67,5 +70,10 @@ def delete_file(data: dict):
         os.remove(file_path)
         return {'message': 'File deleted successfully'}
     else:return {'error': 'File not found'}, 404
+
+@app.get("/static/script")
+def serve_js(data: dict = None):    
+    with open('script.js', 'rb') as f:content = f.read()
+    return content.decode('utf-8')
 
 app.run()
