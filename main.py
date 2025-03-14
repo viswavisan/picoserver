@@ -1,9 +1,11 @@
 import gc
 gc.mem_free()
-import hotspot
+import connection
 from miniserver import Server
 import os
 import machine
+
+connection.enable_hotspot()
 
 return_value={}
 
