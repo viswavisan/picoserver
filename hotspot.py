@@ -13,11 +13,14 @@ class WiFi:
     def hotspot_configure(self):
         ap = network.WLAN(network.AP_IF)
         ap.active(False)
-        time.sleep(1)
-        ap.active(True)
+        time.sleep(2)
         ap.config(essid='picow', password='picow123')
+        ap.active(True)
         while not ap.active():time.sleep(1)
         ip = ap.ifconfig()[0]
+        with open('example.txt', 'w') as file:
+            file.write(str(ap.config('essid')))
+
         print('Access Point active. IP:', ip)
         return ip
 

@@ -20,6 +20,16 @@ def home(data=None):
     context = {'temperature':temp,'memory':memory}
     return app.template_response('index.html', context)
 
+@app.get("/lighton")
+def on(data=None):
+    led.on()
+    return 'ok'
+@app.get("/lightoff")
+def on(data=None):
+    led.off()
+    return 'ok'
+    
+
 @app.post("/execute")
 def execute(request:dict=None):
     try:

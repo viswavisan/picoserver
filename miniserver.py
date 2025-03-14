@@ -75,3 +75,4 @@ class Server:
 
         return html_content
 
+
