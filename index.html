@@ -51,7 +51,7 @@
             display: flex;
             flex-direction: column; /* Stack items vertically */
             align-items: flex-start; /* Align items to the start */
-            margin: 0 10px; /* Add some margin between columns */
+           
         }
 
     </style>
@@ -79,14 +79,14 @@
             <div class="box1">
 
                 <div class="container1">
-                    <div class="switch-column" id="left-switches" style="margin-top: 40px;"></div>
+                    <div class="switch-column" id="left-switches" style="margin-top: 40px; min-width:40px"></div>
                     <div class="switch-column" id="imagerow">
                         <label class="toggle-switch" style="align-self: anchor-center;">
                             <input type="checkbox" onchange="">BOARD-LED
                         </label>
                         <img src="https://logicaprogrammabile.it/wp-content/uploads/2021/02/pipo_pinout.jpg" alt="Raspberry Pi Pico">
                     </div>
-                    <div class="switch-column" id="right-switches" style="margin-top: 40px;"></div>
+                    <div class="switch-column" id="right-switches" style="margin-top: 40px;min-width:40px"></div>
                 </div>
 
                 <script>
