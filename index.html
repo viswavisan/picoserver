@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File List</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,39 +24,43 @@
             justify-content: space-between;
         }
 
-        .container .device-details {flex: 1;}
+        .container .device-details {flex: 1;min-width: 300px;}
 
-        @media (max-width: 768px) {
+        @media (max-width: 1000px) {
             .container {flex-direction: column;}
             .container .device-details {margin-bottom: 10px;}
         }
-        .device-details, .file-section { flex: 1; margin: 10px; }
+        .device-details, .controls { flex: 1; margin: 10px; }
         .box, .wifi-info {
             margin-top: 20px;
             padding: 10px;
             background: #e9ecef;
             border-radius: 5px;
         }
-        #file-list { list-style-type: none; padding: 0; }
-        #file-list li {
-            background: #fff; margin: 5px 0; padding: 10px; border-radius: 5px;
-            display: flex; justify-content: space-between; align-items: center;
+        
+        img {
+            width: 420px;
         }
-        button {
-            background: none; border: none; cursor: pointer; font-size: 20px; color: #007BFF;
-            transition: color 0.3s;
+
+        .container1 {
+            display: flex; /* Keep the container horizontal */
+            align-items: flex-start; /* Align items to the start */
         }
-        button:hover { color: #0056b3; }
-        input, select {
-            margin: 10px 0; padding: 10px; border-radius: 5px; border: 1px solid #ccc; width: calc(100% - 25px);
+
+        .switch-column {
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            align-items: flex-start; /* Align items to the start */
+            margin: 0 10px; /* Add some margin between columns */
         }
-        .action-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
+
     </style>
 
 </head>
 <body>
     <h1>RaspberryPi PICO</h1>
     <div class="container">
+
         <div class="device-details">
             <h2>Device Details</h2>
             <div class="wifi-info">
@@ -68,137 +73,50 @@
                 <p>Wi-Fi: Not connected <button id="connect_wifi">+</button></p>
             </div>
         </div>
-        <div class="file-section">
-            <h2>Files:</h2>
-            <div class="box">
-                <ul id="file-list"></ul>
-            </div>
-            <div>
-                <label for="directory">Select Directory:</label>
-                <select name="directory" id="directory"></select>
-                <div class="action-buttons">
-                    <input type="file" name="file" id="file" required>
-                    <button id="upload-button">&#8682;</button>
+
+        <div class="controls">
+            <h2>Controls:</h2>
+            <div class="box1">
+
+                <div class="container1">
+                    <div class="switch-column" id="left-switches" style="margin-top: 40px;"></div>
+                    <div class="switch-column" id="imagerow">
+                        <label class="toggle-switch" style="align-self: anchor-center;">
+                            <input type="checkbox" onchange="">BOARD-LED
+                        </label>
+                        <img src="https://logicaprogrammabile.it/wp-content/uploads/2021/02/pipo_pinout.jpg" alt="Raspberry Pi Pico">
+                    </div>
+                    <div class="switch-column" id="right-switches" style="margin-top: 40px;"></div>
                 </div>
-                <label for="new-directory-name">Add Folder:</label>
-                <input type="text" id="new-directory-name" placeholder="Enter new directory name" required>
-                <button id="add-directory-button">&#128193;</button>
+
+                <script>
+                    $(document).ready(function() {
+                        // Create toggle switches for left side (Pins 1-20)
+                        for (let i = 1; i <= 20; i++) {
+                            $('#left-switches').append(`
+                                <label class="toggle-switch">
+                                    <input type="checkbox" onchange="togglePin('pin${i}', this.checked)">${i}
+                                </label>
+                            `);
+                        }
+
+                        // Create toggle switches for right side (Pins 21-40)
+                        for (let i = 40; i >= 21; i--) {
+                            $('#right-switches').append(`
+                                <label class="toggle-switch">
+                                    <input type="checkbox" onchange="togglePin('pin${i}', this.checked)">${i}
+                                </label>
+                            `);
+                        }
+                    });
+
+                    function togglePin(pin, state) {
+                        console.log(`Pin ${pin} is now ${state ? 'ON' : 'OFF'}`);
+                        // Add your code to handle the GPIO pin state change here
+                    }
+                </script>
             </div>
         </div>
     </div>
-
-    <script>
-
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchFiles();
-            document.getElementById('upload-button').onclick = upload;
-            document.getElementById('add-directory-button').onclick = addDirectory;
-        });
-        
-        function fetchFiles() {
-        console.log('1')
-            fetch('/files')
-                .then(response => response.json())
-                .then(data => {
-                console.log(data)
-                    const fileList = document.getElementById('file-list');
-                    const directorySelect = document.getElementById('directory');
-                    fileList.innerHTML = '';
-                    data.files.forEach(file => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                            <span class="file-name">${file}</span>
-                            <button onclick="downloadFile('${file}')">&#8681;</button>
-                            <button onclick="deleteFile('${file}')">&#128465;</button>
-                        `;
-                        fileList.appendChild(li);
-                    });
-                    directorySelect.innerHTML = data.dirs.map(dir => `<option value="${dir}">${dir}</option>`).join('');
-                })
-                .catch(console.error);
-        }
-        
-        </script>
-        
-        <script>
-                function addDirectory() {
-            const newDirectoryName = document.getElementById('new-directory-name').value;
-            if (!newDirectoryName) return alert('Please enter a directory name.');
-            const option = document.createElement('option');
-            option.value = newDirectoryName; option.textContent = newDirectoryName;
-            document.getElementById('directory').appendChild(option);
-            document.getElementById('new-directory-name').value = '';
-        }
-        </script>
-        <script>
-
-        function upload(event) {
-            event.preventDefault();
-            const fileInput = document.getElementById('file');
-            const directorySelect = document.getElementById('directory');
-            const file = fileInput.files[0];
-            if (!file) return alert('Please select a file to upload.');
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const data = {
-                    file_name: file.name,
-                    directory: directorySelect.value,
-                    content: Array.from(new Uint8Array(event.target.result))
-                };
-                fetch('/upload', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    fetchFiles();
-                })
-                .catch(console.error);
-            };
-            reader.readAsArrayBuffer(file);
-        }
-        </script>
-        <script>
-        
-
-        function downloadFile(fileName) {
-            const selectedDirectory = document.getElementById('directory').value;
-            fetch('/download', {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ file_name: fileName, directory: selectedDirectory })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) return alert(data.error);
-                const blob = new Blob([new Uint8Array(data.content)], { type: 'application/octet-stream' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = data.file_name;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            })
-            .catch(console.error);
-        }
-
-        function deleteFile(fileName) {
-            const selectedDirectory = document.getElementById('directory').value;
-            fetch('/delete', {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ file_name: fileName, directory: selectedDirectory })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message || data.error);
-                fetchFiles();
-            })
-            .catch(console.error);
-        }
-
-
-    </script>
 </body>
 </html>
