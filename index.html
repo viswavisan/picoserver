@@ -111,13 +111,7 @@
                     });
 
                     function togglePin(pin, state) {
-                        console.log(`Pin ${pin} is now ${state ? 'ON' : 'OFF'}`);
-                        if (pin=='LED'){
-                            $.post('/execute', JSON.stringify({ cmd: state ? 'led.on()' : 'led.off()' }), 
-                                function(response) {
-                                    console.log('LED state changed:', response) ;})
-                        }
-                        
+                        if (pin=='LED'){$.post('/execute', JSON.stringify({ cmd: state ? 'led.on()' : 'led.off()' }))}   
                     }
                 </script>
             </div>

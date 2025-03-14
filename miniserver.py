@@ -23,7 +23,6 @@ class Server:
 
     def handle_request(self, client):
         request = client.recv(1024).decode('utf-8')
-        print(request)
         request_line = request.splitlines()[0]
         method, path, _ = request_line.split()
         body = ""
