@@ -23,6 +23,7 @@ class Server:
 
     def handle_request(self, client):
         request = client.recv(1024).decode('utf-8')
+        print(request)
         request_line = request.splitlines()[0]
         method, path, _ = request_line.split()
         body = ""
@@ -35,7 +36,7 @@ class Server:
         json_data = {}
         if body:
             try:json_data = json.loads(body)
-            except json.JSONDecodeError:json_data = {"error": "Invalid JSON"}
+            except :json_data = {"error": "Invalid JSON"}
 
         handler = self.routes.get((path, method))
         if handler:response = handler(json_data)
