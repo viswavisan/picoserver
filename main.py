@@ -20,11 +20,10 @@ def home(data=None):
 
 @app.post("/execute")
 def execute(request:dict=None):
-    if 'cmd' in request:return_value={};exec(request['cmd'];return return_value
+    if 'cmd' in request:return_value={};exec(request['cmd']);return return_value
 
 @app.get("/files")
 def get_files(data=None):
-    directory = '.'
     files_and_dirs = {'files': os.listdir(), 'dirs': ['']}  
     return files_and_dirs
 
