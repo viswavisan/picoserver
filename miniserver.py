@@ -22,36 +22,41 @@ class Server:
         return decorator
 
     def handle_request(self, client):
-        request = client.recv(1024).decode('utf-8')
-        request_line = request.splitlines()[0]
-        method, path, _ = request_line.split()
-        body = ""
-        headers = request.splitlines()
-        content_length = 0
-        for header in headers:
-            if header.startswith("Content-Length:"):content_length = int(header.split(":")[1].strip())
-        if content_length > 0:body = request.splitlines()[-1]
+        try:
+            request = client.recv(1024).decode('utf-8')
+            request_line = request.splitlines()[0]
+            method, path, _ = request_line.split()
+            body = ""
+            headers = request.splitlines()
+            content_length = 0
+            for header in headers:
+                if header.startswith("Content-Length:"):content_length = int(header.split(":")[1].strip())
+            if content_length > 0:body = request.splitlines()[-1]
 
-        json_data = {}
-        if body:
-            try:json_data = json.loads(body)
-            except :json_data = {"error": "Invalid JSON"}
+            json_data = {}
+            if body:
+                try:json_data = json.loads(body)
+                except :json_data = {"error": "Invalid JSON"}
 
-        handler = self.routes.get((path, method))
-        if handler:response = handler(json_data)
-        else:response = '404 Not Found'
+            handler = self.routes.get((path, method))
+            if handler:response = handler(json_data)
+            else:response = '404 Not Found'
 
-        if isinstance(response, dict):
-            response_body = json.dumps(response)
-            response_headers = 'Content-Type: application/json\r\n'
-        else:
-            response_body = response
-            response_headers = 'Content-Type: text/html\r\n'
+            if isinstance(response, dict):
+                response_body = json.dumps(response)
+                response_headers = 'Content-Type: application/json\r\n'
+            else:
+                response_body = response
+                response_headers = 'Content-Type: text/html\r\n'
 
-        client.send(b'HTTP/1.1 200 OK\r\n' + response_headers.encode() + b'\r\n')
-        client.send(response_body.encode('utf-8'))
-        client.close()
-
+            client.send(b'HTTP/1.1 200 OK\r\n' + response_headers.encode() + b'\r\n')
+            client.send(response_body.encode('utf-8'))
+            client.close()
+        except Exception as e:
+            error_message = f"HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/plain\r\n\r\n{str(e)}"
+            client.send(error_message.encode('utf-8'))
+        finally:client.close()
+        
     def run(self, host='0.0.0.0', port=80):
         server = socket.socket()
         for i in range (10):
@@ -61,7 +66,6 @@ class Server:
                 print('reconnecting'+str(i))
                 if i==9:machine.reset()
         server.listen(1)
-        print(f'Serving on http://{host}:{port}')
 
         while True:
             client, _ = server.accept()
