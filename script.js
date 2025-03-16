@@ -65,6 +65,18 @@ function scan_wifi() {
     }
     connectWiFi1()
 
+    
+    async function checkap() {
+
+        const hotspot = document.getElementById('hotspot')
+        fetch('/execute', {method: 'POST',body: JSON.stringify({ cmd: `return_value["data"]=connection.ap.active()`})})
+        .then(response => response.json())
+        .then(data=>{hotspot.textContent=data['data']})
+        console.log('ok')
+    }
+
+    checkap()
+
 
     document.getElementById('connect_wifi').addEventListener('click', connectWiFi);
     document.getElementById('scan').addEventListener('click', scan_wifi);
