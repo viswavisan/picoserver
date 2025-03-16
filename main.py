@@ -37,4 +37,9 @@ def serve_js(data: dict = None):
     with open('script.js', 'rb') as f:content = f.read()
     return content.decode('utf-8')
 
+@app.get("/style.css")
+def serve_js(data: dict = None):    
+    with open('style.css', 'rb') as f:content = f.read()
+    return content.decode('utf-8')
+
 app.run()
