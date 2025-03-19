@@ -28,6 +28,7 @@ def home(data=None):
 @app.post("/execute")
 def execute(request:dict=None):
     try:
+        return_value.clear()
         if 'cmd' in request:exec(request['cmd']);return return_value
         return 'working fine'
     except Exception as e:return str(e)

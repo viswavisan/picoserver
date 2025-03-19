@@ -1,1 +1,1 @@
-table={'wifi': {'Devil': 'annyeo12'}}
+table={'wifi': {'Devil': 'annyeo12','kokila':'kokila123'}}
