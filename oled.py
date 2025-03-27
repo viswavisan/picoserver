@@ -1,6 +1,6 @@
 from micropython import const
 from machine import Pin, I2C
-import framebuf, utime
+import framebuf
 
 # Register definitions
 SET_DISP = const(0xAE)
