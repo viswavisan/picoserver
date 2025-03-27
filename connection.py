@@ -34,12 +34,20 @@ def connect_wifi(ssid='Devil', password='annyeo12'):
             time.sleep(1)
         return status
     except Exception as e: return {'status':'error','message':str(e)}
+    
 def auto_connect():
+    print('trying auto connect')
     try:
+        wlan.active(False)
+        time.sleep(1)
+        wlan.active(True)
         for network_info in wlan.scan():
             ssid=network_info[0].decode()
             if ssid in database.table['wifi']:
                 x=connect_wifi(ssid,database.table['wifi'][ssid])
                 print(x)
-    except:pass
+                return x
+
+    except Exception as e:return str(e)
+
 auto_connect()

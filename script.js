@@ -29,12 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 create_switches()
 
-
+async function check_stored_password(ssid) {
+    const response = await fetch('/execute', {method: 'POST',body: JSON.stringify({ cmd: `return_value["data"]=connection.database.table['wifi']['${ssid}']` })});
+    const data = await response.json();
+    console.log(data)
+    return data.data;
+}
 
 
 async function connectWiFi() {
     const ssid = document.getElementById('wifi_list').value;
-    const password = prompt("Enter Password:");
+    let password = await check_stored_password(ssid); 
+    if (!password){
+         password = prompt("Enter Password:");}
     const wstate = document.getElementById('wstate')
     wstate.textContent='connecting...'
     if (ssid && password) {
@@ -55,15 +62,23 @@ function scan_wifi() {
             data['data'].forEach(ssid => wifiSelect.add(new Option(ssid, ssid)))})
     }
 
-    async function connectWiFi1() {
+    async function wifi_status1() {
 
         const wstate1 = document.getElementById('wstate')
         fetch('/execute', {method: 'POST',body: JSON.stringify({ cmd: `return_value["data"]=connection.check_status()`})})
         .then(response => response.json())
-        .then(data=>{wstate1.textContent=data['data']['message']})
+        .then(data=>{wstate1.textContent=data['data']['message'];console.log(data['data']['message'])})
         console.log('ok')
     }
-    connectWiFi1()
+    wifi_status1()
+
+    async function autoconnect() {
+
+        fetch('/execute', {method: 'POST',body: JSON.stringify({ cmd: `return_value["data"]=connection.auto_connect()`})})
+        .then(response => response.json())
+        .then(data=>{console.log(data)})
+        console.log('ok')
+    }
 
     
     async function checkap() {
@@ -71,15 +86,26 @@ function scan_wifi() {
         const hotspot = document.getElementById('hotspot')
         fetch('/execute', {method: 'POST',body: JSON.stringify({ cmd: `return_value["data"]=connection.ap.active()`})})
         .then(response => response.json())
-        .then(data=>{hotspot.textContent=data['data']})
+        .then(data=>{hotspot.textContent=data['data'];})
         console.log('ok')
     }
 
     checkap()
 
+    async function changeap() {
+        let code
+        const hotspot = document.getElementById('hotspot')
+        if (hotspot.textContent=='true'){code='False'}
+        else{code='True'}
+        fetch('/execute', {method: 'POST',body: JSON.stringify({ cmd: `return_value["data"]=connection.ap.active(${code})`})})
+        .then(response => response.json())
+        .then(data=>{hotspot.textContent=code.toLowerCase();console.log(code.toLowerCase())})
+    }
+
 
     document.getElementById('connect_wifi').addEventListener('click', connectWiFi);
     document.getElementById('scan').addEventListener('click', scan_wifi);
+    document.getElementById('check_status').addEventListener('click', changeap);
     scan_wifi()
 
     document.getElementById('pico_image').src="https://logicaprogrammabile.it/wp-content/uploads/2021/02/pipo_pinout.jpg"

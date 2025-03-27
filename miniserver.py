@@ -58,18 +58,23 @@ class Server:
         finally:client.close()
         
     def run(self, host='0.0.0.0', port=80):
-        server = socket.socket()
-        for i in range (10):
-            try:server.bind((host, port));break
-            except Exception as e:
-                time.sleep(1)
-                print('reconnecting'+str(i))
-                if i==9:machine.reset()
-        server.listen(1)
-
-        while True:
-            client, _ = server.accept()
-            self.handle_request(client)
+        print('server starting')
+        try:
+            server = socket.socket()
+            for i in range (10):
+                try:server.bind((host, port));break
+                except Exception as e:
+                    time.sleep(1)
+                    print('reconnecting'+str(i))
+                    if i==9:machine.reset()
+            server.listen(1)
+            print('port connected')
+            while True:
+                try:
+                    client, _ = server.accept()
+                    self.handle_request(client)
+                except:pass
+        except Exception as e:print(str(e))
 
     def template_response(self, file_path, context=None):
         if context is None:context = {}
